@@ -49,13 +49,7 @@ opt_ans
 ## Result Images
 After obtaining the solution with SciPy, the code generates a plot to visualize the constraints, objective function, and the optimal solution point.
 
-```python
-# Result images for SciPy implementation
-
-# ... (result image plotting code)
-
-plt.show()
-```
+![image example](https://github.com/denis-samatov/Simplex_method/blob/main/img_2.png)
 
 ## Manual Implementation
 The code then provides a manual implementation of the simplex method to solve the same linear programming problem. The simplex method functions are defined along with a main function `simplex` that orchestrates the process.
@@ -63,20 +57,12 @@ The code then provides a manual implementation of the simplex method to solve th
 ```python
 # Manual Implementation
 
-# ... (simplex method code)
-
 x, y = simplex(c, A, b)
 ```
 
 ## Result Images for Manual Implementation
 Finally, the code generates a plot to visualize the constraints, objective function, and the optimal solution point obtained through the manual implementation of the simplex method.
 
-```python
-# Result images for Manual implementation
-
-# ... (result image plotting code)
-
-plt.show()
-```
+![image example](https://github.com/denis-samatov/Simplex_method/blob/main/img_3.png)
 
 Feel free to use and modify this code for your own linear programming problems.
