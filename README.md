@@ -37,8 +37,6 @@ The SciPy library is used to solve the linear programming problem. The code sets
 ```python
 # Implementation with SciPy
 
-# ... (SciPy implementation code)
-
 opt_ans = linprog(c=obj, A_ub=left_side_ineq, b_ub=right_side_ineq,
                   A_eq=left_side_eq, b_eq=right_side_eq, bounds=bnd,
                   method="revised simplex")
