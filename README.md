@@ -1,18 +1,20 @@
 # Optimization Problem Solver
 
-This repository contains Python code that demonstrates the solution of a linear programming optimization problem using both the SciPy library and a manual implementation of the simplex method.
+This repository demonstrates solving a linear programming problem with both `scipy.optimize.linprog` and a manual, from-scratch simplex tableau implementation, then compares the two.
+
+**The problem:** blend two water sources of different hardness (Class I and Class II) so the total blend is exactly 300 tons (`x + y = 300`) and a second constraint `x + 2y <= 375` is satisfied, minimizing cost `8x + 6y`. See [`Simplex_method.ipynb`](Simplex_method.ipynb) for the full walkthrough with plots.
 
 ## Table of Contents
-- [Optimization Problem Solver](#optimization-problem-solver)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Loading Libraries](#loading-libraries)
-  - [Building a Task Plot](#building-a-task-plot)
-  - [Implementation with SciPy](#implementation-with-scipy)
-  - [Result Images](#result-images)
-  - [Manual Implementation](#manual-implementation)
-  - [Result Images for Manual Implementation](#result-images-for-manual-implementation)
-  - [Usage](#usage)
+- [Introduction](#introduction)
+- [Loading Libraries](#loading-libraries)
+- [Building a Task Plot](#building-a-task-plot)
+- [Implementation with SciPy](#implementation-with-scipy)
+- [Result Images](#result-images)
+- [Manual Implementation](#manual-implementation)
+- [Result Images for Manual Implementation](#result-images-for-manual-implementation)
+- [Tests](#tests)
+- [Usage](#usage)
+
 ## Introduction
 
 This repository provides a comprehensive solution for linear programming optimization problems using two methods:
@@ -42,33 +44,23 @@ from icecream import ic
 
 A plot is generated to visualize the optimization problem. This plot illustrates the constraints and objective function of the problem.
 
-![Task Plot](https://github.com/denis-samatov/Simplex_method/blob/main/img_1.png)
+![Task Plot](images/img_1.png)
 
 ## Implementation with SciPy
 
-The SciPy library is used to solve the linear programming problem. The code sets up the objective function and constraints, and then calls the `linprog` function to find the optimal solution.
+The SciPy library is used to solve the linear programming problem. `linprog()` only solves minimization problems (not maximization) and does not allow `>=` inequality constraints -- both true of the formulation below, which is why the problem is set up as a minimization with one equality and one `<=` constraint.
 
 ```python
-# Objective function coefficients
-obj = [-1, -2]
+obj = [8, 6]
 
-# Coefficients for the inequality constraints
-left_side_ineq = [[ 2,  1],  # Red constraint left side
-                  [-4,  5],  # Blue constraint left side
-                  [ 1, -2]]  # Yellow constraint left side
+left_side_ineq = [[1, 2]]
+right_side_ineq = [375]
 
-# Right-hand side of the inequality constraints
-right_side_ineq = [20, 10, 2]
+left_side_eq = [[1, 1]]
+right_side_eq = [300]
 
-# Coefficients for the equality constraint
-left_side_eq = [[-1, 5]]  # Green constraint left side
-
-# Right-hand side of the equality constraint
-right_side_eq = [15]
-
-# Bounds for each variable
-bnd = [(0, float("inf")),  # Bounds of x
-       (0, float("inf"))]  # Bounds of y
+bnd = [(0, float("inf")),
+       (0, float("inf"))]
 
 opt_ans = linprog(c=obj, A_ub=left_side_ineq, b_ub=right_side_ineq,
                   A_eq=left_side_eq, b_eq=right_side_eq, bounds=bnd,
@@ -77,35 +69,54 @@ opt_ans = linprog(c=obj, A_ub=left_side_ineq, b_ub=right_side_ineq,
 opt_ans
 ```
 
+This gives `x = 225`, `y = 75`, objective value `2250`.
+
 ## Result Images
 
 After obtaining the solution with SciPy, the code generates a plot to visualize the constraints, objective function, and the optimal solution point.
 
-![SciPy Result](https://github.com/denis-samatov/Simplex_method/blob/main/img_2.png)
+![SciPy Result](images/img_2.png)
 
 ## Manual Implementation
 
-The code provides a manual implementation of the simplex method to solve the same linear programming problem. The simplex method functions are defined along with a main function `simplex` that orchestrates the process.
+The code also provides a manual, from-scratch implementation of the simplex tableau method on the same problem, extracted into [`simplex_solver.py`](simplex_solver.py) so it's importable outside the notebook. It reaches the same answer as SciPy on this problem (`x = 225`, `y = 75`) -- see [Tests](#tests).
 
 ```python
-# Manual Implementation
-def simplex(c, A, b):
-    # Implement the simplex method
-    pass
+from simplex_solver import simplex
 
-x, y = simplex(c, A, b)
+c = [8.0, 6.0, 0.0]
+A = [[1.0, 1.0, 0.0],
+     [1.0, 2.0, 0.0]]
+b = [300.0, 375.0]
+
+x, y, _ = simplex(c, A, b)
 ```
+
+Note this isn't a general-purpose LP solver: the caller has to already know how many tableau columns are needed and pad `c`/`A` accordingly (as above), and it has only been verified against this one problem.
 
 ## Result Images for Manual Implementation
 
 Finally, the code generates a plot to visualize the constraints, objective function, and the optimal solution point obtained through the manual implementation of the simplex method.
 
-![Manual Simplex Result](https://github.com/denis-samatov/Simplex_method/blob/main/img_3.png)
+![Manual Simplex Result](images/img_3.png)
+
+## Tests
+
+`tests/test_simplex_vs_scipy.py` checks the manual implementation's answer against `scipy.optimize.linprog` on this repo's reference problem. Run with:
+
+```bash
+pip install -r requirements.txt pytest
+PYTHONPATH=. pytest tests/
+```
 
 ## Usage
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/denis-samatov/Simplex_method.git
-   cd Simplex_method
+   git clone https://github.com/denis-samatov/simplex_method.git
+   cd simplex_method
+   ```
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
    ```
